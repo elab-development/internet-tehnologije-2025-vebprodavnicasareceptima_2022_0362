@@ -13,13 +13,15 @@ const ingredientTypeRoutes = require("./routes/ingredientType.routes");
 const productRoutes = require("./routes/product.routes");
 
 const recipeRoutes = require("./routes/recipe.routes");
+
+const authRoutes = require("./routes/auth.routes");
  
 const app = express();
  
 app.use(cors());
 
 app.use(express.json());
- 
+
 // API rute
 
 app.use("/api/health", healthRoutes);
@@ -29,8 +31,10 @@ app.use("/api/ingredient-types", ingredientTypeRoutes);
 app.use("/api/products", productRoutes);
 
 app.use("/api/recipes", recipeRoutes);
+
+app.use("/api/auth", authRoutes);
  
-// (opciono) fallback za nepostojece rute
+
 
 app.use((req, res) => {
 
