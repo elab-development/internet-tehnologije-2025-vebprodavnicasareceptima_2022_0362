@@ -1,44 +1,86 @@
-//Home stranica 
+// Home stranica
 
-import { useState } from 'react';
-import Button from '../components/Button';
+import { useState } from "react";
+import Button from "../components/Button";
+import { login, register } from "../api/auth";
+import { useAuth } from "../context/AuthContext";
 
-export default function Home({ role, onRoleChange }) {
-  const [authRole, setAuthRole] = useState(null);
+export default function Home() {
+  const { user, setUser, logout, loading } = useAuth();
+
+  const [authRole, setAuthRole] = useState(null); // "user" ili "admin"
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
-  const [registerForm, setRegisterForm] = useState({ name: '', email: '', password: '' });
 
-  const handleRoleSelect = (selectedRole) => {
-  if (selectedRole === 'guest') {
-    onRoleChange(selectedRole);
-    return;
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [registerForm, setRegisterForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const currentRole = user ? user.role : "guest";
+
+  // Dok AuthContext proverava token i /me, prikaži loading
+  if (loading) {
+    return <div style={{ padding: 20 }}>Učitavanje naloga...</div>;
   }
-
-  setAuthRole(selectedRole);
-  setShowRegister(false);
-  setShowLogin(true);
-};
 
   const closeAuthModals = () => {
     setShowLogin(false);
     setShowRegister(false);
   };
 
-  const handleLoginSubmit = (e) => {
-  e.preventDefault();
-  if (!authRole) return;
+  const handleRoleSelect = (selectedRole) => {
+    if (selectedRole === "guest") {
+      logout(); // vraća na gosta i briše token
+      closeAuthModals();
+      return;
+    }
 
-  onRoleChange(authRole);
-  closeAuthModals();
-};
+    setAuthRole(selectedRole);
+    setShowRegister(false);
+    setShowLogin(true);
+  };
 
-  const handleRegisterSubmit = (e) => {
-  e.preventDefault();
-  onRoleChange('user');
-  closeAuthModals();
-};
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    if (!authRole) return;
+
+    try {
+      const u = await login({
+        email: loginForm.email,
+        password: loginForm.password,
+      });
+
+      // Ako je korisnik kliknuo Admin, a nalog nije admin -> zabrani
+      if (authRole === "admin" && u.role !== "admin") {
+        throw new Error("Ovaj nalog nema admin privilegije.");
+      }
+
+      setUser(u);
+      closeAuthModals();
+    } catch (err) {
+      alert(err?.message || "Greška pri prijavi.");
+    }
+  };
+
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const u = await register({
+        name: registerForm.name,
+        email: registerForm.email,
+        password: registerForm.password,
+      });
+
+      setUser(u);
+      closeAuthModals();
+    } catch (err) {
+      alert(err?.message || "Greška pri registraciji.");
+    }
+  };
 
   return (
     <div className="home-page">
@@ -66,10 +108,10 @@ export default function Home({ role, onRoleChange }) {
                 <li>✓ Pogledajte detalje recepata</li>
               </ul>
               <Button
-                label={role === 'guest' ? 'Trenutno ste Gost' : 'Nastavi kao Gost'}
-                onClick={() => handleRoleSelect('guest')}
-                variant={role === 'guest' ? 'disabled' : 'primary'}
-                disabled={role === 'guest'}
+                label={currentRole === "guest" ? "Trenutno ste Gost" : "Nastavi kao Gost"}
+                onClick={() => handleRoleSelect("guest")}
+                variant={currentRole === "guest" ? "disabled" : "primary"}
+                disabled={currentRole === "guest"}
               />
             </div>
 
@@ -82,13 +124,13 @@ export default function Home({ role, onRoleChange }) {
                 <li>✓ Sve funkcionalnosti gost korisnika</li>
                 <li>✓ Dodajte sastojke koje posedujete</li>
                 <li>✓ Dodajte proizvode u korpu i izvršite kupovinu</li>
-                <li>✓ Šačuvajte omiljene recepte</li>
+                <li>✓ Sačuvajte omiljene recepte</li>
               </ul>
               <Button
-                label={role === 'user' ? 'Ulogovan kao Korisnik' : 'Uloguj se kao Korisnik'}
-                onClick={() => handleRoleSelect('user')}
-                variant={role === 'user' ? 'disabled' : 'primary'}
-                disabled={role === 'user'}
+                label={currentRole === "user" ? "Ulogovan kao Korisnik" : "Uloguj se kao Korisnik"}
+                onClick={() => handleRoleSelect("user")}
+                variant={currentRole === "user" ? "disabled" : "primary"}
+                disabled={currentRole === "user"}
               />
             </div>
 
@@ -104,21 +146,24 @@ export default function Home({ role, onRoleChange }) {
                 <li>✓ Pregled i upravljanje porudžbinama</li>
               </ul>
               <Button
-                label={role === 'admin' ? 'Ulogovan kao Admin' : 'Uloguj se kao Admin'}
-                onClick={() => handleRoleSelect('admin')}
-                variant={role === 'admin' ? 'disabled' : 'primary'}
-                disabled={role === 'admin'}
+                label={currentRole === "admin" ? "Ulogovan kao Admin" : "Uloguj se kao Admin"}
+                onClick={() => handleRoleSelect("admin")}
+                variant={currentRole === "admin" ? "disabled" : "primary"}
+                disabled={currentRole === "admin"}
               />
             </div>
           </div>
         </div>
 
         {/* Current Role Info */}
-        {role !== 'guest' && (
+        {currentRole !== "guest" && (
           <div className="current-role-info">
             <p>
-             Trenutno ste ulogovani kao <strong>{role === 'user' ? 'Korisnik' : 'Admin'}</strong>
+              Trenutno ste ulogovani kao{" "}
+              <strong>{currentRole === "user" ? "Korisnik" : "Admin"}</strong>
             </p>
+
+            <Button label="Odjavi se" variant="primary" onClick={logout} />
           </div>
         )}
       </div>
@@ -127,8 +172,11 @@ export default function Home({ role, onRoleChange }) {
       {showLogin && (
         <div className="auth-modal" onClick={closeAuthModals}>
           <div className="auth-modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="auth-close" onClick={closeAuthModals}>✕</button>
-            <h3>{authRole === 'admin' ? 'Admin prijava' : 'Prijava'}</h3>
+            <button className="auth-close" onClick={closeAuthModals}>
+              ✕
+            </button>
+            <h3>{authRole === "admin" ? "Admin prijava" : "Prijava"}</h3>
+
             <form onSubmit={handleLoginSubmit} className="auth-form">
               <label>Email</label>
               <input
@@ -138,6 +186,7 @@ export default function Home({ role, onRoleChange }) {
                 className="input-field"
                 required
               />
+
               <label>Lozinka</label>
               <input
                 type="password"
@@ -146,17 +195,18 @@ export default function Home({ role, onRoleChange }) {
                 className="input-field"
                 required
               />
+
               <Button
                 label="Prijavi se"
                 variant="primary"
-                style={{ width: '100%' }}
+                style={{ width: "100%" }}
                 type="submit"
               />
             </form>
 
-            {authRole === 'user' && (
+            {authRole === "user" && (
               <p className="auth-switch">
-                Nemate nalog?{' '}
+                Nemate nalog?{" "}
                 <button
                   type="button"
                   className="auth-link"
@@ -176,8 +226,11 @@ export default function Home({ role, onRoleChange }) {
       {showRegister && (
         <div className="auth-modal" onClick={closeAuthModals}>
           <div className="auth-modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="auth-close" onClick={closeAuthModals}>✕</button>
+            <button className="auth-close" onClick={closeAuthModals}>
+              ✕
+            </button>
             <h3>Registracija</h3>
+
             <form onSubmit={handleRegisterSubmit} className="auth-form">
               <label>Ime i prezime</label>
               <input
@@ -187,6 +240,7 @@ export default function Home({ role, onRoleChange }) {
                 className="input-field"
                 required
               />
+
               <label>Email</label>
               <input
                 type="email"
@@ -195,6 +249,7 @@ export default function Home({ role, onRoleChange }) {
                 className="input-field"
                 required
               />
+
               <label>Lozinka</label>
               <input
                 type="password"
@@ -203,16 +258,17 @@ export default function Home({ role, onRoleChange }) {
                 className="input-field"
                 required
               />
+
               <Button
                 label="Napravi nalog"
                 variant="primary"
-                style={{ width: '100%' }}
+                style={{ width: "100%" }}
                 type="submit"
               />
             </form>
 
             <p className="auth-switch">
-              Već imate nalog?{' '}
+              Već imate nalog?{" "}
               <button
                 type="button"
                 className="auth-link"
