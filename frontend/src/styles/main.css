@@ -1,6 +1,8 @@
 :root {
   --primary-color: #3498db;
   --secondary-color: #95a5a6;
+  --danger-color: #e74c3c;
+  --success-color: #2ecc71;
   --dark-color: #2c3e50;
   --light-color: #ecf0f1;
   --border-color: #bdc3c7;
@@ -26,6 +28,100 @@ body {
   min-height: 100vh;
 }
 
+/* NAVBAR */
+.navbar {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #2980b9 100%);
+  color: white;
+  padding: 0;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+ 
+.navbar-container {
+  width: 100%;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+ 
+.navbar-brand h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0;
+  cursor: pointer;
+  transition: var(--transition);
+}
+ 
+.navbar-brand h1:hover {
+  transform: scale(1.03);
+}
+ 
+.navbar-menu {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+ 
+.navbar-guest .navbar-menu {
+  flex: 1;
+  justify-content: center;
+}
+ 
+.navbar-guest .navbar-user {
+  min-width: 160px;
+  justify-content: flex-end;
+}
+ 
+.nav-link {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: none !important;
+  cursor: pointer;
+  padding: 0.5rem 1rem !important;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+ 
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+ 
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+ 
+.user-role,
+.user-name {
+  font-size: 0.9rem;
+}
+ 
+.nav-logout {
+  padding: 0.5rem 1rem !important;
+  font-size: 0.9rem;
+}
+ 
+/* Responsive navbar */
+@media (max-width: 768px) {
+  .navbar-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .navbar-menu {
+    justify-content: center;
+  }
+  .navbar-user {
+    justify-content: center;
+  }
+}
 /* Button */
 .btn {
   padding: 0.75rem 1.25rem;
@@ -48,6 +144,35 @@ body {
 .btn-primary {
   background: var(--primary-color);
   color: white;
+
+}
+
+.btn-secondary {
+
+  background-color: var(--secondary-color);
+
+  color: white;
+
+}
+ 
+.btn-secondary:hover:not(:disabled) {
+
+  filter: brightness(0.95);
+
+}
+ 
+.btn-danger {
+
+  background-color: var(--danger-color);
+
+  color: white;
+
+}
+ 
+.btn-danger:hover:not(:disabled) {
+
+  filter: brightness(0.92);
+
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -245,4 +370,562 @@ body {
   .hero h2 {
     font-size: 2rem;
   }
+}
+
+/* search bar */
+.recipes-search,
+.products-search {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+.recipes-search .input-group,
+.products-search .input-group {
+  margin-bottom: 1rem;
+}
+
+.recipes-search .input-group:last-child,
+.products-search .input-group:last-child {
+  margin-bottom: 0;
+}
+
+.recipes-search label,
+.products-search label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--dark-color);
+  text-align: center;
+}
+
+.recipes-search .input-field,
+.products-search .input-field,
+.products-search select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+.recipes-search .input-field:focus,
+.products-search .input-field:focus,
+.products-search select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 6px rgba(52, 152, 219, 0.25);
+}
+
+.recipes-search .input-field::placeholder,
+.products-search .input-field::placeholder {
+  color: #999;
+}
+
+.filter-section {
+  margin-top: 1rem;
+}
+
+.filter-section label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--dark-color);
+  text-align: center;
+}
+
+.search-results {
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+/*Recepti*/
+.recipes-page {
+  flex: 1;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  min-height: calc(100vh - 100px);
+}
+
+.recipes-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.recipes-header h2 {
+  font-size: 2.5rem;
+  color: var(--dark-color);
+  margin-bottom: 0.5rem;
+}
+
+.recipes-search {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+.products-search {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+.search-results {
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.recipes-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.recipe-section {
+  display: block;
+  text-align: center;
+}
+
+.recipe-section h3 {
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.recipes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.recipe-card {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.recipe-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.recipe-image {
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  overflow: hidden;
+
+}
+
+.recipe-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recipe-info {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.recipe-info h3 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.recipe-description {
+  color: var(--secondary-color);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.recipe-meta {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.recipe-meta span {
+  background: var(--light-color);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+}
+
+.missing-badge {
+  padding: 0.5rem 1rem !important;
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 0.9rem !important;
+}
+
+.missing-badge.can-make {
+  background: var(--success-color);
+  color: white;
+}
+
+.missing-badge.partial {
+  background: #f39c12;
+  color: white;
+}
+
+.missing-badge.missing {
+  background: var(--danger-color);
+  color: white;
+}
+
+.recipe-card .btn {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  margin-top: auto;
+}
+
+.favorite-btn {
+  width: 100%;
+}
+
+.no-recipes {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  background: white;
+  border-radius: 10px;
+}
+
+/* Detalji recepta */
+.recipe-details-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content h2 {
+  margin-bottom: 1.5rem;
+  flex-shrink: 0;
+  padding-right: 2rem;
+}
+
+/* Proizvodi u receptima */
+.modal-content .products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Skrol proizvoda u receptima */
+.modal-content .products-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content .products-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.modal-content .products-grid::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 10px;
+}
+
+.modal-content .products-grid::-webkit-scrollbar-thumb:hover {
+  background: #2980b9;
+}
+
+/* Velicina proizvoda u receptima */
+.modal-content .product-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content .product-card .product-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0;
+}
+
+.modal-content .product-card .product-info h4 {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 1rem;
+}
+
+.modal-content .product-card .product-info p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.modal-content .product-card .btn {
+  margin-top: auto;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  white-space: normal;
+}
+
+/* Back button wrapper - always at bottom */
+.modal-content .modal-back-button {
+  flex-shrink: 0;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ecf0f1;
+}
+
+/* Velicina proizvoda u receptima */
+.modal-content .product-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.modal-content .product-card .btn {
+  margin-top: auto;
+}
+
+.close-modal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--light-color);
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.close-modal:hover {
+  background: var(--danger-color);
+  color: white;
+}
+
+.modal-image {
+  font-size: 4rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-image img {
+  max-width: 80%;
+  max-height: 250px;
+  object-fit: contain;
+}
+
+.modal-content h2 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.modal-description {
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+}
+
+.modal-details,
+.modal-ingredients {
+  background: var(--light-color);
+  padding: 1.5rem;
+  border-radius: 5px;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  margin-bottom: 0.5rem;
+}
+
+.modal-ingredients h4 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.modal-ingredients ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.modal-ingredients li {
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.modal-ingredients li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--success-color);
+  font-weight: bold;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modal-actions .btn {
+  flex: 1;
+}
+
+/* Products Grid */
+.products-page {
+  flex: 1;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  min-height: calc(100vh - 100px);
+}
+
+.products-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.products-header h2 {
+  font-size: 2.5rem;
+  color: var(--dark-color);
+  margin-bottom: 0.5rem;
+}
+
+.products-header p {
+  color: var(--secondary-color);
+  font-size: 1rem;
+}
+
+.products-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.product-card {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.product-image {
+  font-size: 3rem;
+  padding: 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-info {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-info h3 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.product-ingredient,
+.product-package {
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.product-price {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--success-color);
+  margin-bottom: 1rem;
+}
+
+.product-card .btn {
+  width: 100%;
+  margin-top: auto;
+}
+
+.no-products {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  background: white;
+  border-radius: 10px;
 }
