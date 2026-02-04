@@ -929,3 +929,124 @@ body {
   background: white;
   border-radius: 10px;
 }
+
+/* INGREDIENTS PAGE (SASTOJCI) */
+
+.ingredients-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.ingredients-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.ingredients-header h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.ingredients-header p {
+  margin: 6px 0 0 0;
+  opacity: 0.8;
+}
+
+.access-denied {
+  max-width: 720px;
+  margin: 40px auto;
+  padding: 24px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  text-align: center;
+}
+
+.add-ingredient-form {
+  margin: 18px 0 26px 0;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.add-ingredient-form h3 {
+  margin: 0 0 14px 0;
+}
+
+.form-group {
+  display: grid;
+  gap: 14px;
+}
+
+.ingredient-selector {
+  display: grid;
+  gap: 6px;
+}
+
+.ingredient-selector label {
+  font-weight: 600;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: rgba(0, 0, 0, 0.35);
+}
+
+.ingredients-list {
+  margin-top: 18px;
+}
+
+.ingredients-list h3 {
+  margin: 0 0 12px 0;
+}
+
+.ingredients-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.ingredients-table thead th {
+  text-align: left;
+  font-weight: 700;
+  padding: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.ingredients-table tbody td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.ingredient-row:last-child td {
+  border-bottom: none;
+}
+
+.no-ingredients {
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px dashed rgba(0, 0, 0, 0.22);
+  opacity: 0.9;
+}
+
+/* Malo lepši layout na većim ekranima */
+@media (min-width: 768px) {
+  .form-group {
+    grid-template-columns: 1fr 1fr auto;
+    align-items: end;
+  }
+
+  .add-ingredient-form button {
+    height: 42px;
+    white-space: nowrap;
+  }
+}
