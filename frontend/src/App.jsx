@@ -21,7 +21,7 @@ export default function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/recipes" element={<Recipes role={role} />} />
+        <Route path="/recipes" element={<Recipes role={role} userProducts={userProducts} />} />
         <Route path="/products" element={<Products role={role} />} />
 
         <Route

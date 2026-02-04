@@ -1,14 +1,38 @@
 import { useState, useEffect } from 'react';
-import { DUMMY_PRODUCTS, DUMMY_INGREDIENTS } from '../data';
+import { getProducts } from '../api/products';
 import Input from '../components/Input';
 import Button from '../components/Button';
 
-export default function Products({ role, cartItems, setCartItems }) {
-  const [products, setProducts] = useState(DUMMY_PRODUCTS);
+const EMPTY_ARRAY = [];
+
+export default function Products({ role = 'guest', cartItems = EMPTY_ARRAY, setCartItems = () => {} }) {
+  const [products, setProducts] = useState([]);
+  const [ingredientTypes, setIngredientTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIngredientFilter, setSelectedIngredientFilter] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [filteredProducts, setFilteredProducts] = useState(DUMMY_PRODUCTS);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
+  const normalizeProduct = (product) => ({
+    ...product,
+    ingredientType: product.IngredientType?.name || product.ingredientType || '',
+    image: product.imageUrl || product.image || '🧺',
+    price: Number(product.price || 0),
+  });
+
+  useEffect(() => {
+    getProducts()
+      .then((data) => {
+        const normalized = data.map(normalizeProduct);
+        setProducts(normalized);
+        setFilteredProducts(normalized);
+        setIngredientTypes(Array.from(new Set(normalized.map((p) => p.ingredientType))).filter(Boolean));
+      })
+      .catch((err) => setError(err?.message || 'Greška pri učitavanju proizvoda.'))
+      .finally(() => setLoading(false));
+  }, []);
 
   // useEffect za filtriranje proizvoda na osnovu searchTerm i selectedIngredientFilter
   useEffect(() => {
@@ -69,7 +93,13 @@ export default function Products({ role, cartItems, setCartItems }) {
   const ProductCard = ({ product }) => {
     return (
       <div className="product-card">
-        <div className="product-image">{product.image}</div>
+        <div className="product-image">
+          {product.image?.startsWith('http') ? (
+            <img src={product.image} alt={product.name} className="product-img" />
+          ) : (
+            product.image
+          )}
+        </div>
         <div className="product-info">
           <h3>{product.name}</h3>
           <p className="product-ingredient">
@@ -91,6 +121,14 @@ export default function Products({ role, cartItems, setCartItems }) {
       </div>
     );
   };
+
+  if (loading) {
+    return <div style={{ padding: 20 }}>Učitavanje proizvoda...</div>;
+  }
+
+  if (error) {
+    return <div style={{ padding: 20, color: 'red' }}>{error}</div>;
+  }
 
   return (
     <div className="products-page">
@@ -118,7 +156,7 @@ export default function Products({ role, cartItems, setCartItems }) {
             className="input-field"
           >
             <option value="">-- Svi proizvodi --</option>
-            {DUMMY_INGREDIENTS.map((ingredient) => (
+            {ingredientTypes.map((ingredient) => (
               <option key={ingredient} value={ingredient}>
                 {ingredient}
               </option>

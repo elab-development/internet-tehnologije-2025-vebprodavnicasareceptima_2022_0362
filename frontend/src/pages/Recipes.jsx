@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { DUMMY_RECIPES, DUMMY_PRODUCTS, findMissingIngredients, countMissingIngredients, groupRecipesByMissing, getProductsForIngredient } from '../data';
+import { findMissingIngredients, countMissingIngredients, groupRecipesByMissing } from '../data';
+import { getRecipes, getFavoriteRecipeIds, addFavoriteRecipe, removeFavoriteRecipe } from '../api/recipes';
+import { getProducts } from '../api/products';
 import Input from '../components/Input';
 import Button from '../components/Button';
 
@@ -11,50 +13,90 @@ export default function Recipes({
   cartItems = EMPTY_ARRAY,
   setCartItems = () => {}
 }) {
-  const [recipes, setRecipes] = useState(DUMMY_RECIPES);
+  const [recipes, setRecipes] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [selectedIngredient, setSelectedIngredient] = useState(null);
-  const [filteredRecipes, setFilteredRecipes] = useState(DUMMY_RECIPES);
+  const [filteredRecipes, setFilteredRecipes] = useState([]);
   const [groupedRecipes, setGroupedRecipes] = useState({ canMakeNow: [], missing1to2: [], missingMore: [] });
   const [favoritesLoaded, setFavoritesLoaded] = useState(false);
- 
-  const FAVORITES_STORAGE_KEY = 'favoriteRecipeIds';
+  const [favoriteIds, setFavoriteIds] = useState([]);
+  const [baseLoaded, setBaseLoaded] = useState(false);
  
   const sortFavoritesFirst = (list) => {
     return [...list].sort((a, b) => (b.isFavorite === true) - (a.isFavorite === true));
   };
 
-  // Ucitaj omiljene iz lokalne memorije
+  const normalizeRecipe = (recipe) => {
+    const ingredients = (recipe.RecipeIngredients || []).map((ing) => ({
+      name: ing.IngredientType?.name || '',
+      quantity: Number(ing.quantity || 0),
+      unit: ing.unit || '',
+    }));
+
+    return {
+      ...recipe,
+      image: recipe.imageUrl || recipe.image || '',
+      prepTime: recipe.prepTimeMinutes ? `${recipe.prepTimeMinutes} min` : recipe.prepTime || '',
+      ingredients,
+    };
+  };
+
+  const normalizeProduct = (product) => ({
+    ...product,
+    ingredientType: product.IngredientType?.name || product.ingredientType || '',
+    image: product.imageUrl || product.image || '🧺',
+    price: Number(product.price || 0),
+  });
+
   useEffect(() => {
-    const stored = localStorage.getItem(FAVORITES_STORAGE_KEY);
-    if (!stored) {
+    if (role !== 'user') {
+      setFavoriteIds([]);
       setFavoritesLoaded(true);
       return;
     }
 
-    let favoriteIds = [];
-    try {
-      favoriteIds = JSON.parse(stored) || [];
-    } catch (e) {
-      favoriteIds = [];
-    }
+    getFavoriteRecipeIds()
+      .then((ids) => setFavoriteIds(ids))
+      .catch(() => setFavoriteIds([]))
+      .finally(() => setFavoritesLoaded(true));
+  }, [role]);
+
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([getRecipes(), getProducts()])
+      .then(([recipesData, productsData]) => {
+        const normalizedRecipes = recipesData.map(normalizeRecipe).map((recipe) => ({
+          ...recipe,
+          isFavorite: favoriteIds.includes(recipe.id),
+        }));
+
+        const normalizedProducts = productsData.map(normalizeProduct);
+
+        setRecipes(normalizedRecipes);
+        setProducts(normalizedProducts);
+        setFilteredRecipes(normalizedRecipes);
+        setBaseLoaded(true);
+      })
+      .catch((err) => {
+        setError(err?.message || 'Greška pri učitavanju podataka.');
+      })
+      .finally(() => setLoading(false));
+  }, [role]);
+
+  useEffect(() => {
+    if (!baseLoaded) return;
 
     setRecipes((prev) =>
       prev.map((recipe) => ({
         ...recipe,
-        isFavorite: favoriteIds.includes(recipe.id)
+        isFavorite: favoriteIds.includes(recipe.id),
       }))
     );
-    setFavoritesLoaded(true);
-  }, []);
-
-  // Sacuvaj omiljene u lokalnu memoriju 
-  useEffect(() => {
-    if (!favoritesLoaded) return;
-    const favoriteIds = recipes.filter((r) => r.isFavorite).map((r) => r.id);
-    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favoriteIds));
-  }, [recipes, favoritesLoaded]);
+  }, [favoriteIds, baseLoaded]);
 
   // useEffect za filtriranje i pretragu recepata
   useEffect(() => {
@@ -72,21 +114,34 @@ export default function Recipes({
     setGroupedRecipes(groupRecipesByMissing(sortedFiltered, userProducts));
   }, [searchTerm, recipes, userProducts]);
 
+  const getProductsForIngredientLocal = (ingredientName) => {
+    return products.filter(
+      (product) => product.ingredientType.toLowerCase() === ingredientName.toLowerCase()
+    );
+  };
+
   // Pretraga handler
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
 
   // Dugme omiljeni
-  const handleToggleFavorite = (id) => {
+  const handleToggleFavorite = async (id) => {
     if (role !== 'user') {
       alert('Only registered users can add favorites!');
       return;
     }
-    const updatedRecipes = recipes.map((recipe) =>
-      recipe.id === id ? { ...recipe, isFavorite: !recipe.isFavorite } : recipe
-    );
-    setRecipes(updatedRecipes);
+    try {
+      if (favoriteIds.includes(id)) {
+        await removeFavoriteRecipe(id);
+        setFavoriteIds((prev) => prev.filter((rid) => rid !== id));
+      } else {
+        await addFavoriteRecipe(id);
+        setFavoriteIds((prev) => [...prev, id]);
+      }
+    } catch (err) {
+      alert(err?.message || 'Greška pri čuvanju omiljenih.');
+    }
   };
 
  // Provera da li je sastojak vec u korpi
@@ -204,6 +259,14 @@ export default function Recipes({
 
   // Prikaz filtriranog prikaza za goste (svi recepti) i korisnike (sortirano po sastojcima)
   const showSortedView = role === 'user';
+
+  if (loading) {
+    return <div style={{ padding: 20 }}>Učitavanje recepata...</div>;
+  }
+
+  if (error) {
+    return <div style={{ padding: 20, color: 'red' }}>{error}</div>;
+  }
 
   return (
     <div className="recipes-page">
@@ -389,7 +452,7 @@ export default function Recipes({
               <h2>Izaberite proizvod za: {selectedIngredient.name}</h2>
               
               <div className="products-grid">
-                {getProductsForIngredient(selectedIngredient.name).map((product) => (
+                {getProductsForIngredientLocal(selectedIngredient.name).map((product) => (
                   <div key={product.id} className="product-card">
                     <div className="product-image">{product.image}</div>
                     <div className="product-info">

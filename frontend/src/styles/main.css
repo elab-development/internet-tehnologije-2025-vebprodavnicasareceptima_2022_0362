@@ -91,6 +91,12 @@ body {
 .nav-link:hover {
   background: rgba(255, 255, 255, 0.3) !important;
 }
+
+.nav-link-active {
+  background: rgba(255, 255, 255, 0.4) !important;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+  font-weight: 700;
+}
  
 .navbar-user {
   display: flex;
@@ -650,6 +656,8 @@ body {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
+  text-align: center;
+  align-items: center;
 }
 
 .modal-content h2 {
@@ -777,6 +785,26 @@ body {
 .modal-description {
   color: var(--secondary-color);
   margin-bottom: 1.5rem;
+}
+
+.modal-details,
+.modal-ingredients,
+.missing-summary,
+.can-make-msg {
+  width: 100%;
+  text-align: center;
+}
+
+.modal-ingredients ul,
+.missing-summary ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0 auto;
+}
+
+.modal-ingredients li,
+.missing-summary li {
+  padding: 0.35rem 0;
 }
 
 .modal-details,

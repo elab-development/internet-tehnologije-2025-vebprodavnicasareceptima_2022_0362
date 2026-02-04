@@ -1,9 +1,10 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Button from "./Button";
 import { useAuth } from "../context/AuthContext";
  
 export default function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuth();
  
   // uloga: guest | user | admin
@@ -18,6 +19,8 @@ export default function Navbar() {
   const handleNavigation = (path) => {
     navigate(path);
   };
+
+  const isActive = (path) => location.pathname === path;
  
   return (
 <nav className="navbar">
@@ -33,7 +36,7 @@ export default function Navbar() {
             label="Početna"
             onClick={() => handleNavigation("/")}
             variant="secondary"
-            className="nav-link"
+            className={`nav-link${isActive("/") ? " nav-link-active" : ""}`}
           />
  
           {/* Recepti/Proizvodi: gost + korisnik */}
@@ -42,7 +45,7 @@ export default function Navbar() {
               label="Recepti"
               onClick={() => handleNavigation("/recipes")}
               variant="secondary"
-              className="nav-link"
+              className={`nav-link${isActive("/recipes") ? " nav-link-active" : ""}`}
             />
           )}
  
@@ -51,7 +54,7 @@ export default function Navbar() {
               label="Proizvodi"
               onClick={() => handleNavigation("/products")}
               variant="secondary"
-              className="nav-link"
+              className={`nav-link${isActive("/products") ? " nav-link-active" : ""}`}
             />
           )}
  
@@ -62,13 +65,13 @@ export default function Navbar() {
                 label="Sastojci"
                 onClick={() => handleNavigation("/ingredients")}
                 variant="secondary"
-                className="nav-link"
+                className={`nav-link${isActive("/ingredients") ? " nav-link-active" : ""}`}
               />
 <Button
                 label="Korpa"
                 onClick={() => handleNavigation("/cart")}
                 variant="secondary"
-                className="nav-link"
+                className={`nav-link${isActive("/cart") ? " nav-link-active" : ""}`}
               />
 </>
           )}
@@ -79,7 +82,7 @@ export default function Navbar() {
               label="Admin panel"
               onClick={() => handleNavigation("/admin")}
               variant="secondary"
-              className="nav-link"
+              className={`nav-link${isActive("/admin") ? " nav-link-active" : ""}`}
             />
           )}
 </div>

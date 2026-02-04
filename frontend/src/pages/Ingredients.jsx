@@ -4,7 +4,7 @@ import { getProducts } from "../api/products";
 import { getMyProducts, addMyProduct, deleteMyProduct } from "../api/myProducts";
 import { useAuth } from "../context/AuthContext";
 
-export default function Ingredients() {
+export default function Ingredients({ userProducts = [], setUserProducts = () => {} }) {
   const { user, loading } = useAuth();
 
   const role = user?.role ?? "guest";
@@ -20,12 +20,22 @@ export default function Ingredients() {
     if (loading) return;
     if (!isUser) return;
 
+    const mapMyProductsToUserProducts = (items) =>
+      items
+        .map((item) => item.product)
+        .filter(Boolean)
+        .map((product) => ({
+          ...product,
+          ingredientType: product.IngredientType?.name || product.ingredientType || "",
+        }));
+
     async function loadData() {
       try {
         const products = await getProducts();
         const mine = await getMyProducts();
         setAllProducts(products);
         setMyProducts(mine);
+        setUserProducts(mapMyProductsToUserProducts(mine));
       } catch (err) {
         console.error(err);
         alert(err?.message || "Greška pri učitavanju podataka iz baze.");
@@ -45,6 +55,15 @@ export default function Ingredients() {
       await addMyProduct(Number(selectedProduct), 1);
       const mine = await getMyProducts();
       setMyProducts(mine);
+      setUserProducts(
+        mine
+          .map((item) => item.product)
+          .filter(Boolean)
+          .map((product) => ({
+            ...product,
+            ingredientType: product.IngredientType?.name || product.ingredientType || "",
+          }))
+      );
       setSelectedProduct("");
     } catch (err) {
       console.error(err);
@@ -57,6 +76,15 @@ export default function Ingredients() {
       await deleteMyProduct(productId);
       const mine = await getMyProducts();
       setMyProducts(mine);
+      setUserProducts(
+        mine
+          .map((item) => item.product)
+          .filter(Boolean)
+          .map((product) => ({
+            ...product,
+            ingredientType: product.IngredientType?.name || product.ingredientType || "",
+          }))
+      );
     } catch (err) {
       console.error(err);
       alert(err?.message || "Greška pri brisanju proizvoda.");
