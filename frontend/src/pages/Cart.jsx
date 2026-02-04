@@ -1,0 +1,152 @@
+/**
+ * Cart Page
+ * Registered users can view and manage shopping cart
+ * Cart contains only ingredients/products, not recipes
+ * Uses useState for cart management
+ */
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Button from '../components/Button';
+
+export default function Cart({ role, cartItems, setCartItems }) {
+  const navigate = useNavigate();
+  // Handle remove item from cart
+  const handleRemoveFromCart = (id) => {
+    setCartItems(cartItems.filter(item => item.id !== id));
+  };
+
+  // Update quantity
+  const handleUpdateQuantity = (id, newQuantity) => {
+    if (newQuantity <= 0) {
+      handleRemoveFromCart(id);
+      return;
+    }
+    setCartItems(cartItems.map(item =>
+      item.id === id ? { ...item, totalQuantity: newQuantity } : item
+    ));
+  };
+
+  // Calculate total
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => total + item.price * item.totalQuantity, 0);
+  };
+
+  // Check role
+  if (role !== 'user') {
+    return (
+      <div className="cart-page">
+        <div className="access-denied">
+          <h2>Pristup odbijen!</h2>
+          <p>Samo registrovani korisnici mogu da pregledaju i uređuju korpu.</p>
+          <p>Molimo vas da se prijavite da bi ste nastavili.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="cart-page">
+      <div className="cart-header">
+        <h2>Korpa</h2>
+        <p>Vaši proizvodi</p>
+      </div>
+
+      {/* Cart Items */}
+      <div className="cart-items">
+        {cartItems.length > 0 ? (
+          <>
+            <h3>Proizvodi u korpi ({cartItems.length})</h3>
+            <table className="cart-table">
+              <thead>
+                <tr>
+                  <th>Proizvod</th>
+                  <th>Cena</th>
+                  <th>Količina</th>
+                  <th>Ukupno</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {cartItems.map((item) => (
+                  <tr key={item.id} className="cart-item">
+                    <td>{item.name}</td>
+                    <td>{item.price.toFixed(2)} RSD</td>
+                    <td>
+                      <div className="quantity-control">
+                        <button
+                          onClick={() => handleUpdateQuantity(item.id, item.totalQuantity - 1)}
+                          className="qty-btn"
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          value={item.totalQuantity}
+                          onChange={(e) => handleUpdateQuantity(item.id, parseInt(e.target.value) || 1)}
+                          className="qty-input"
+                          min="1"
+                        />
+                        <button
+                          onClick={() => handleUpdateQuantity(item.id, item.totalQuantity + 1)}
+                          className="qty-btn"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </td>
+                    <td>{(item.price * item.totalQuantity).toFixed(2)} RSD</td>
+                    <td>
+                      <Button
+                        label="Remove"
+                        onClick={() => handleRemoveFromCart(item.id)}
+                        variant="danger"
+                        className="remove-btn"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Cart Summary */}
+            <div className="cart-summary">
+              <div className="summary-item">
+                <strong>Ukupan broj proizvoda:</strong> {cartItems.length}
+              </div>
+              {/*<div className="summary-item">
+                <strong>Ukupna količina:</strong> {cartItems.reduce((sum, item) => sum + item.totalQuantity, 0)}
+              </div>*/}
+              <div className="summary-total">
+                <strong>Ukupna cena:</strong> {calculateTotal().toFixed(2)} RSD
+              </div>
+            </div>
+
+            {/* Cart Actions */}
+            <div className="cart-actions">
+              <Button
+                label="Isprazni korpu"
+                onClick={() => setCartItems([])}
+                variant="danger"
+              />
+              <Button
+                label="Plaćanje"
+                onClick={() => alert(`Checkout: ${calculateTotal().toFixed(2)} RSD`)}
+                variant="primary"
+              />
+            </div>
+          </>
+        ) : (
+          <div className="empty-cart">
+            <p>Vaša korpa je prazna</p>
+            <p>Idite na stranicu recepata i izaberite nedostajuće sastojke!</p>
+            <Button
+              label="Proizvodi"
+              onClick={() => navigate('/products')}
+              variant="primary"
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

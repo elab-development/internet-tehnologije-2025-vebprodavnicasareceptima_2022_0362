@@ -5,6 +5,8 @@ import Home from "./pages/Home";
 import Recipes from "./pages/Recipes";
 import Products from "./pages/Products";
 import Ingredients from "./pages/Ingredients";
+import Cart from "./pages/Cart";
+import Admin from "./pages/Admin";
 import "./styles/main.css";
 import { useAuth } from "./context/AuthContext";
 
@@ -14,6 +16,8 @@ export default function App() {
 
   // Moji proizvodi - Ingredients
   const [userProducts, setUserProducts] = useState([]);
+  // Cart items
+  const [cartItems, setCartItems] = useState([]);
 
   return (
     <>
@@ -21,8 +25,8 @@ export default function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/recipes" element={<Recipes role={role} userProducts={userProducts} />} />
-        <Route path="/products" element={<Products role={role} />} />
+        <Route path="/recipes" element={<Recipes role={role} userProducts={userProducts} cartItems={cartItems} setCartItems={setCartItems} />} />
+        <Route path="/products" element={<Products role={role} cartItems={cartItems} setCartItems={setCartItems} />} />
 
         <Route
           path="/ingredients"
@@ -34,6 +38,10 @@ export default function App() {
             />
           }
         />
+
+        <Route path="/cart" element={<Cart role={role} cartItems={cartItems} setCartItems={setCartItems} />} />
+
+        <Route path="/admin" element={<Admin role={role} />} />
 
         <Route path="*" element={<Home />} />
       </Routes>
