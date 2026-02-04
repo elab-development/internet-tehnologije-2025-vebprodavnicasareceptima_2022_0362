@@ -1,53 +1,89 @@
-import { useState } from "react";
-import { DUMMY_PRODUCTS, DUMMY_INGREDIENTS } from "../data";
+import { useEffect, useMemo, useState } from "react";
 import Button from "../components/Button";
+import { getProducts } from "../api/products";
+import { getMyProducts, addMyProduct, deleteMyProduct } from "../api/myProducts";
+import { useAuth } from "../context/AuthContext";
 
-export default function Ingredients({ role, userProducts, setUserProducts }) {
-  const [newProduct, setNewProduct] = useState({ selectedProduct: "" });
+export default function Ingredients() {
+  const { user, loading } = useAuth();
+
+  const role = user?.role ?? "guest";
+  const isUser = role === "user"; // u backendu je role: guest|user|admin
+
+  const [allProducts, setAllProducts] = useState([]);
+  const [myProducts, setMyProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState("");
   const [selectedIngredientFilter, setSelectedIngredientFilter] = useState("");
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewProduct({ ...newProduct, [name]: value });
-  };
+  // učitaj podatke tek kad znaš da je user učitan
+  useEffect(() => {
+    if (loading) return;
+    if (!isUser) return;
 
-  const handleAddProduct = () => {
-    if (!newProduct.selectedProduct) {
+    async function loadData() {
+      try {
+        const products = await getProducts();
+        const mine = await getMyProducts();
+        setAllProducts(products);
+        setMyProducts(mine);
+      } catch (err) {
+        console.error(err);
+        alert(err?.message || "Greška pri učitavanju podataka iz baze.");
+      }
+    }
+
+    loadData();
+  }, [loading, isUser]);
+
+  const handleAddProduct = async () => {
+    if (!selectedProduct) {
       alert("Molimo vas da izaberete proizvod!");
       return;
     }
 
-    const productData = DUMMY_PRODUCTS.find(
-      (p) => p.id.toString() === newProduct.selectedProduct
-    );
-
-    if (!productData) {
-      alert("Proizvod nije pronađen!");
-      return;
+    try {
+      await addMyProduct(Number(selectedProduct), 1);
+      const mine = await getMyProducts();
+      setMyProducts(mine);
+      setSelectedProduct("");
+    } catch (err) {
+      console.error(err);
+      alert(err?.message || "Greška pri dodavanju proizvoda.");
     }
+  };
 
-    const alreadyExists = userProducts.find((p) => p.id === productData.id);
-    if (alreadyExists) {
-      alert("Već imate ovaj proizvod!");
-      return;
+  const handleDeleteProduct = async (productId) => {
+    try {
+      await deleteMyProduct(productId);
+      const mine = await getMyProducts();
+      setMyProducts(mine);
+    } catch (err) {
+      console.error(err);
+      alert(err?.message || "Greška pri brisanju proizvoda.");
     }
-
-    setUserProducts([...userProducts, productData]);
-    setNewProduct({ selectedProduct: "" });
   };
 
-  const handleDeleteProduct = (id) => {
-    setUserProducts(userProducts.filter((p) => p.id !== id));
-  };
+  const ingredientTypes = useMemo(
+    () => [...new Set(allProducts.map((p) => p.IngredientType?.name).filter(Boolean))],
+    [allProducts]
+  );
 
-  const getProductsForFilter = () => {
-    if (!selectedIngredientFilter) return DUMMY_PRODUCTS;
-    return DUMMY_PRODUCTS.filter(
-      (p) => p.ingredientType === selectedIngredientFilter
+  const filteredProducts = useMemo(() => {
+    if (!selectedIngredientFilter) return allProducts;
+    return allProducts.filter((p) => p.IngredientType?.name === selectedIngredientFilter);
+  }, [allProducts, selectedIngredientFilter]);
+
+  if (loading) {
+    return (
+      <div className="ingredients-page">
+        <div className="access-denied">
+          <h2>Učitavanje...</h2>
+        </div>
+      </div>
     );
-  };
+  }
 
-  if (role !== "user") {
+  if (!isUser) {
     return (
       <div className="ingredients-page">
         <div className="access-denied">
@@ -71,35 +107,32 @@ export default function Ingredients({ role, userProducts, setUserProducts }) {
 
         <div className="form-group">
           <div className="ingredient-selector">
-            <label htmlFor="ingredient-filter">Filtriraj po tipu sastojka:</label>
+            <label>Filtriraj po tipu sastojka:</label>
             <select
-              id="ingredient-filter"
               value={selectedIngredientFilter}
               onChange={(e) => setSelectedIngredientFilter(e.target.value)}
               className="input-field"
             >
               <option value="">-- Svi proizvodi --</option>
-              {DUMMY_INGREDIENTS.map((ingredient) => (
-                <option key={ingredient} value={ingredient}>
-                  {ingredient}
+              {ingredientTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
                 </option>
               ))}
             </select>
           </div>
 
           <div className="ingredient-selector">
-            <label htmlFor="product-select">Izaberite proizvod:</label>
+            <label>Izaberite proizvod:</label>
             <select
-              id="product-select"
-              name="selectedProduct"
-              value={newProduct.selectedProduct}
-              onChange={handleInputChange}
+              value={selectedProduct}
+              onChange={(e) => setSelectedProduct(e.target.value)}
               className="input-field"
             >
               <option value="">-- Izaberite proizvod --</option>
-              {getProductsForFilter().map((product) => (
+              {filteredProducts.map((product) => (
                 <option key={product.id} value={product.id}>
-                  {product.name} - {product.packageAmount} ({product.price.toFixed(2)} RSD)
+                  {product.name} - {product.packageAmount} ({Number(product.price).toFixed(2)} RSD)
                 </option>
               ))}
             </select>
@@ -114,9 +147,9 @@ export default function Ingredients({ role, userProducts, setUserProducts }) {
       </div>
 
       <div className="ingredients-list">
-        <h3>Moji Proizvodi ({userProducts.length})</h3>
+        <h3>Moji Proizvodi ({myProducts.length})</h3>
 
-        {userProducts.length > 0 ? (
+        {myProducts.length > 0 ? (
           <table className="ingredients-table">
             <thead>
               <tr>
@@ -128,16 +161,16 @@ export default function Ingredients({ role, userProducts, setUserProducts }) {
               </tr>
             </thead>
             <tbody>
-              {userProducts.map((product) => (
-                <tr key={product.id} className="ingredient-row">
-                  <td>{product.name}</td>
-                  <td>{product.ingredientType}</td>
-                  <td>{product.packageAmount}</td>
-                  <td>{product.price.toFixed(2)} RSD</td>
+              {myProducts.map((item) => (
+                <tr key={item.productId} className="ingredient-row">
+                  <td>{item.product?.name}</td>
+                  <td>{item.product?.IngredientType?.name}</td>
+                  <td>{item.product?.packageAmount}</td>
+                  <td>{Number(item.product?.price || 0).toFixed(2)} RSD</td>
                   <td>
                     <Button
                       label="Obriši"
-                      onClick={() => handleDeleteProduct(product.id)}
+                      onClick={() => handleDeleteProduct(item.productId)}
                       variant="danger"
                       className="delete-btn"
                     />

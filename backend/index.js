@@ -15,6 +15,8 @@ const productRoutes = require("./routes/product.routes");
 const recipeRoutes = require("./routes/recipe.routes");
 
 const authRoutes = require("./routes/auth.routes");
+
+const userProductRoutes = require("./routes/userProduct.routes");
  
 const app = express();
  
@@ -33,6 +35,8 @@ app.use("/api/products", productRoutes);
 app.use("/api/recipes", recipeRoutes);
 
 app.use("/api/auth", authRoutes);
+
+app.use("/api/my-products", userProductRoutes);
  
 
 
