@@ -169,6 +169,7 @@ export default function Recipes({
           name: ci.product?.name || ci.Product?.name || '',
           price: Number(ci.product?.price ?? ci.Product?.price ?? 0),
           image: ci.product?.imageUrl || ci.Product?.imageUrl || ci.product?.image || ci.Product?.image || '🧺',
+          ingredientType: ci.product?.IngredientType?.name || ci.Product?.IngredientType?.name || '',
           totalQuantity: ci.quantity,
         }));
         setCartItems(normalized);
@@ -388,38 +389,31 @@ export default function Recipes({
               {/* Nedostajući sastojci */}
               {(() => {
                 const missing = findMissingIngredients(selectedRecipe, userProducts);
-                const missingNotInCart = missing.filter(ing => !isIngredientInCart(ing.name));
-                const missingInCart = missing.filter(ing => isIngredientInCart(ing.name));
                 
                 return missing.length > 0 && role === 'user' ? (
                   <div className="missing-summary">
                     <h4>Nedostajući Sastojci:</h4>
                     <ul>
-                      {missingNotInCart.map((ingredient, idx) => (
-                        <li key={idx}>
-                          {ingredient.name} - {ingredient.quantity}{ingredient.unit}
-                          {role === 'user' && (
-                            <Button
-                              label="Odaberi proizvod"
-                              onClick={() => setSelectedIngredient(ingredient)}
-                              variant="secondary"
-                              className="select-product-btn"
-                            />
-                          )}
-                        </li>
-                      ))}
-                      {missingInCart.length > 0 && (
-                        <>
-                          <li style={{ marginTop: '10px', fontStyle: 'italic', opacity: 0.6 }}>
-                            <strong>Već u korpi:</strong>
+                      {missing.map((ingredient, idx) => {
+                        const inCart = isIngredientInCart(ingredient.name);
+                        return (
+                          <li key={idx} style={inCart ? { opacity: 0.7 } : undefined}>
+                            {ingredient.name} - {ingredient.quantity}{ingredient.unit}
+                            {inCart ? (
+                              <span style={{ marginLeft: '0.5rem', color: 'green' }}>
+                                ✓ Proizvod je dodat u korpu
+                              </span>
+                            ) : role === 'user' ? (
+                              <Button
+                                label="Odaberi proizvod"
+                                onClick={() => setSelectedIngredient(ingredient)}
+                                variant="secondary"
+                                className="select-product-btn"
+                              />
+                            ) : null}
                           </li>
-                          {missingInCart.map((ingredient, idx) => (
-                            <li key={`in-cart-${idx}`} style={{ opacity: 0.6 }}>
-                              <span style={{ color: 'green' }}>✓</span> {ingredient.name} - {ingredient.quantity}{ingredient.unit}
-                            </li>
-                          ))}
-                        </>
-                      )}
+                        );
+                      })}
                     </ul>
                   </div>
                 ) : missing.length === 0 && role === 'user' ? (

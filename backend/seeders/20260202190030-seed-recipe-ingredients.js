@@ -30,6 +30,8 @@ module.exports = {
       'Soja sos': 23,
     };
 
+    await queryInterface.bulkDelete('recipe_ingredients', { recipeId: [1, 2, 3, 4, 5, 6] });
+
     await queryInterface.bulkInsert('recipe_ingredients', [
       // Recipe 1: Karbonara špageti
       { recipeId: 1, ingredientTypeId: ingId['Špageti'], quantity: 400, unit: 'g', createdAt: now, updatedAt: now },

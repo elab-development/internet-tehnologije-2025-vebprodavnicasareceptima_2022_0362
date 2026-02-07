@@ -5,18 +5,22 @@
  * View and change order status
  * Uses useState for all management operations
  */
-import { useState } from 'react';
-import { DUMMY_PRODUCTS, DUMMY_ORDERS, DUMMY_RECIPES, DUMMY_INGREDIENTS } from '../data';
-import { createProduct, deleteProduct as apiDeleteProduct } from '../api/products';
-import { createRecipe, deleteRecipe as apiDeleteRecipe } from '../api/recipes';
+import { useEffect, useState } from 'react';
+import { DUMMY_ORDERS } from '../data';
+import { createProduct, deleteProduct as apiDeleteProduct, getProducts } from '../api/products';
+import { createRecipe, deleteRecipe as apiDeleteRecipe, getRecipes } from '../api/recipes';
+import { getIngredientTypes } from '../api/ingredientTypes';
 import Input from '../components/Input';
 import Button from '../components/Button';
 
 export default function Admin({ role }) {
   // useState hooks for admin management
-  const [products, setProducts] = useState(DUMMY_PRODUCTS);
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(true);
   const [orders, setOrders] = useState(DUMMY_ORDERS);
-  const [recipes, setRecipes] = useState(DUMMY_RECIPES);
+  const [recipes, setRecipes] = useState([]);
+  const [recipesLoading, setRecipesLoading] = useState(true);
+  const [ingredientTypes, setIngredientTypes] = useState([]);
   const [activeTab, setActiveTab] = useState('products');
   const [newProduct, setNewProduct] = useState({ 
     name: '', 
@@ -38,6 +42,78 @@ export default function Admin({ role }) {
     quantity: '',
     unit: ''
   });
+
+  const fetchProducts = () => {
+    setProductsLoading(true);
+    return getProducts()
+      .then((data) => {
+        const normalized = (data || []).map((p) => ({
+          id: p.id,
+          name: p.name,
+          ingredientType: p.IngredientType?.name || p.ingredientType || '',
+          packageAmount: p.packageAmount || '',
+          price: Number(p.price || 0),
+          image: p.imageUrl || p.image || '📦',
+        }));
+        setProducts(normalized);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert(err?.message || 'Greška pri učitavanju proizvoda.');
+      })
+      .finally(() => setProductsLoading(false));
+  };
+
+  const fetchRecipes = () => {
+    setRecipesLoading(true);
+    return getRecipes()
+      .then((data) => {
+        const normalized = (data || []).map((r) => ({
+          id: r.id,
+          name: r.name,
+          description: r.description || '',
+          image: r.imageUrl || r.image || '🍽️',
+          difficulty: r.difficulty || '',
+          prepTime: r.prepTimeMinutes ? `${r.prepTimeMinutes} min` : '',
+          ingredients: (r.RecipeIngredients || []).map((ri) => ({
+            name: ri.IngredientType?.name || '',
+            quantity: Number(ri.quantity || 0),
+            unit: ri.unit || '',
+          })),
+          isFavorite: false,
+        }));
+        setRecipes(normalized);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert(err?.message || 'Greška pri učitavanju recepata.');
+      })
+      .finally(() => setRecipesLoading(false));
+  };
+
+  const fetchIngredientTypes = () => {
+    return getIngredientTypes()
+      .then((data) => {
+        const names = (data || []).map((i) => i.name).filter(Boolean);
+        setIngredientTypes(names);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert(err?.message || 'Greška pri učitavanju tipova sastojaka.');
+      });
+  };
+
+  // Load products from API
+  useEffect(() => {
+    if (role !== 'admin') {
+      setProductsLoading(false);
+      setRecipesLoading(false);
+      return;
+    }
+    fetchProducts();
+    fetchRecipes();
+    fetchIngredientTypes();
+  }, [role]);
 
   // Check role
   if (role !== 'admin') {
@@ -88,6 +164,7 @@ export default function Admin({ role }) {
         };
         setProducts((prev) => [...prev, p]);
         setNewProduct({ name: '', ingredientType: '', packageAmount: '', price: '', image: '' });
+        fetchProducts();
       })
       .catch((err) => {
         console.error(err);
@@ -97,7 +174,7 @@ export default function Admin({ role }) {
 
   const handleDeleteProduct = (id) => {
     apiDeleteProduct(id)
-      .then(() => setProducts(products.filter(p => p.id !== id)))
+      .then(() => fetchProducts())
       .catch((err) => {
         console.error(err);
         alert(err?.message || 'Greška pri brisanju proizvoda.');
@@ -181,6 +258,7 @@ export default function Admin({ role }) {
           prepTime: '',
           ingredients: []
         });
+        fetchRecipes();
       })
       .catch((err) => {
         console.error(err);
@@ -190,7 +268,7 @@ export default function Admin({ role }) {
 
   const handleDeleteRecipe = (id) => {
     apiDeleteRecipe(id)
-      .then(() => setRecipes(recipes.filter(r => r.id !== id)))
+      .then(() => fetchRecipes())
       .catch((err) => {
         console.error(err);
         alert(err?.message || 'Greška pri brisanju recepta.');
@@ -288,7 +366,7 @@ export default function Admin({ role }) {
                   className="input-field"
                 >
                   <option value="">-- Izaberite tip sastojka --</option>
-                  {DUMMY_INGREDIENTS.map((ingredient) => (
+                  {ingredientTypes.map((ingredient) => (
                     <option key={ingredient} value={ingredient}>
                       {ingredient}
                     </option>
@@ -309,6 +387,7 @@ export default function Admin({ role }) {
           {/* Products List */}
           <div className="admin-list">
             <h4>Proizvodi ({products.length})</h4>
+            {productsLoading && <p>Učitavanje proizvoda...</p>}
             <table className="admin-table">
               <thead>
                 <tr>
@@ -416,7 +495,7 @@ export default function Admin({ role }) {
                     className="input-field"
                   >
                     <option value="">-- Izaberite sastojak --</option>
-                    {DUMMY_INGREDIENTS.map((ingredient) => (
+                    {ingredientTypes.map((ingredient) => (
                       <option key={ingredient} value={ingredient}>
                         {ingredient}
                       </option>
@@ -489,6 +568,7 @@ export default function Admin({ role }) {
           {/* Recipes List */}
           <div className="admin-list">
             <h4>Recepti ({recipes.length})</h4>
+            {recipesLoading && <p>Učitavanje recepata...</p>}
             <table className="admin-table">
               <thead>
                 <tr>
