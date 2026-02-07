@@ -17,6 +17,8 @@ const recipeRoutes = require("./routes/recipe.routes");
 const authRoutes = require("./routes/auth.routes");
 
 const userProductRoutes = require("./routes/userProduct.routes");
+
+const cartRoutes = require("./routes/cart.routes");
  
 const app = express();
  
@@ -37,6 +39,8 @@ app.use("/api/recipes", recipeRoutes);
 app.use("/api/auth", authRoutes);
 
 app.use("/api/my-products", userProductRoutes);
+
+app.use("/api/cart", cartRoutes);
  
 
 

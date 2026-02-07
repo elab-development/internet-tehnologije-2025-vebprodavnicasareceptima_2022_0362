@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { findMissingIngredients, countMissingIngredients, groupRecipesByMissing } from '../data';
 import { getRecipes, getFavoriteRecipeIds, addFavoriteRecipe, removeFavoriteRecipe } from '../api/recipes';
 import { getProducts } from '../api/products';
+import { addToCart as apiAddToCart, getCart as apiGetCart } from '../api/cart';
 import Input from '../components/Input';
 import Button from '../components/Button';
 
@@ -158,26 +159,26 @@ export default function Recipes({
       return;
     } 
 
-    const existingItem = cartItems.find(item => item.id === product.id);
-
-    if (existingItem) {
-      // Ažuriraj količinu ako proizvod već postoji
-      const updatedCart = cartItems.map(item =>
-        item.id === product.id
-          ? { ...item, totalQuantity: (item.totalQuantity || 1) + 1 }
-          : item
-      );
-      setCartItems(updatedCart);
-    } else {
-      // Dodaj novi proizvod u korpu
-      setCartItems([...cartItems, {
-        ...product,
-        totalQuantity: 1
-      }]);
-    }
-
-    alert(`${product.name} dodato u korpu!`);
-    setSelectedIngredient(null);
+    // send to backend and refresh cart from server
+    apiAddToCart(product.id, 1)
+      .then(() => apiGetCart())
+      .then((data) => {
+        const normalized = data.map((ci) => ({
+          id: ci.productId || ci.id,
+          productId: ci.productId,
+          name: ci.product?.name || ci.Product?.name || '',
+          price: Number(ci.product?.price ?? ci.Product?.price ?? 0),
+          image: ci.product?.imageUrl || ci.Product?.imageUrl || ci.product?.image || ci.Product?.image || '🧺',
+          totalQuantity: ci.quantity,
+        }));
+        setCartItems(normalized);
+        alert(`${product.name} dodato u korpu!`);
+        setSelectedIngredient(null);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert(err?.message || 'Greška pri dodavanju u korpu.');
+      });
   };
 
   // Prikaz recepta

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -9,6 +9,7 @@ import Cart from "./pages/Cart";
 import Admin from "./pages/Admin";
 import "./styles/main.css";
 import { useAuth } from "./context/AuthContext";
+import { getCart as apiGetCart } from "./api/cart";
 
 export default function App() {
   const { user } = useAuth();
@@ -18,6 +19,23 @@ export default function App() {
   const [userProducts, setUserProducts] = useState([]);
   // Cart items
   const [cartItems, setCartItems] = useState([]);
+
+  useEffect(() => {
+    if (!user) return;
+    apiGetCart()
+      .then((data) => {
+        const normalized = data.map((ci) => ({
+          id: ci.productId || ci.id,
+          productId: ci.productId,
+          name: ci.product?.name || ci.Product?.name || '',
+          price: Number(ci.product?.price ?? ci.Product?.price ?? 0),
+          image: ci.product?.imageUrl || ci.Product?.imageUrl || ci.product?.image || ci.Product?.image || '🧺',
+          totalQuantity: ci.quantity,
+        }));
+        setCartItems(normalized);
+      })
+      .catch((err) => console.error('Failed to load cart', err));
+  }, [user]);
 
   return (
     <>

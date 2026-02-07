@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getProducts } from '../api/products';
+import { addToCart as apiAddToCart, getCart as apiGetCart } from '../api/cart';
 import Input from '../components/Input';
 import Button from '../components/Button';
 
@@ -68,25 +69,26 @@ export default function Products({ role = 'guest', cartItems = EMPTY_ARRAY, setC
       return;
     }
 
-    const existingItem = cartItems.find(item => item.id === product.id);
-
-    if (existingItem) {
-      // Ažuriraj količinu ako proizvod već postoji
-      const updatedCart = cartItems.map(item =>
-        item.id === product.id
-          ? { ...item, totalQuantity: (item.totalQuantity || 1) + 1 }
-          : item
-      );
-      setCartItems(updatedCart);
-    } else {
-      // Dodaj novi proizvod u korpu
-      setCartItems([...cartItems, {
-        ...product,
-        totalQuantity: 1
-      }]);
-    }
-
-    alert(`${product.name} je dodat u korpu!`);
+    // send to backend and refresh cart from server
+    apiAddToCart(product.id, 1)
+      .then(() => apiGetCart())
+      .then((data) => {
+        // normalize server cart items to frontend shape
+        const normalized = data.map((ci) => ({
+          id: ci.productId || ci.id,
+          productId: ci.productId,
+          name: ci.product?.name || ci.Product?.name || '',
+          price: Number(ci.product?.price ?? ci.Product?.price ?? 0),
+          image: ci.product?.imageUrl || ci.Product?.imageUrl || ci.product?.image || ci.Product?.image || '🧺',
+          totalQuantity: ci.quantity,
+        }));
+        setCartItems(normalized);
+        alert(`${product.name} je dodat u korpu!`);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert(err?.message || 'Greška pri dodavanju u korpu.');
+      });
   };
 
   // Prikaz kartice proizvoda

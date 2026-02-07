@@ -7,6 +7,8 @@
  */
 import { useState } from 'react';
 import { DUMMY_PRODUCTS, DUMMY_ORDERS, DUMMY_RECIPES, DUMMY_INGREDIENTS } from '../data';
+import { createProduct, deleteProduct as apiDeleteProduct } from '../api/products';
+import { createRecipe, deleteRecipe as apiDeleteRecipe } from '../api/recipes';
 import Input from '../components/Input';
 import Button from '../components/Button';
 
@@ -66,20 +68,40 @@ export default function Admin({ role }) {
       return;
     }
 
-    const product = {
-      id: Math.max(...products.map(p => p.id), 0) + 1,
+    // send to backend
+    createProduct({
       name: newProduct.name,
       ingredientType: newProduct.ingredientType,
       packageAmount: newProduct.packageAmount,
       price: parseFloat(newProduct.price),
-      image: newProduct.image
-    };
-    setProducts([...products, product]);
-    setNewProduct({ name: '', ingredientType: '', packageAmount: '', price: '', image: '' });
+      image: newProduct.image,
+    })
+      .then((created) => {
+        // normalize product for admin list
+        const p = {
+          id: created.id,
+          name: created.name,
+          ingredientType: created.IngredientType?.name || newProduct.ingredientType,
+          packageAmount: created.packageAmount,
+          price: Number(created.price),
+          image: created.imageUrl || created.image,
+        };
+        setProducts((prev) => [...prev, p]);
+        setNewProduct({ name: '', ingredientType: '', packageAmount: '', price: '', image: '' });
+      })
+      .catch((err) => {
+        console.error(err);
+        alert(err?.message || 'Greška pri dodavanju proizvoda.');
+      });
   };
 
   const handleDeleteProduct = (id) => {
-    setProducts(products.filter(p => p.id !== id));
+    apiDeleteProduct(id)
+      .then(() => setProducts(products.filter(p => p.id !== id)))
+      .catch((err) => {
+        console.error(err);
+        alert(err?.message || 'Greška pri brisanju proizvoda.');
+      });
   };
 
   // Recipe Management
@@ -127,29 +149,52 @@ export default function Admin({ role }) {
       return;
     }
 
-    const recipe = {
-      id: Math.max(...recipes.map(r => r.id), 0) + 1,
+    createRecipe({
       name: newRecipe.name,
       description: newRecipe.description,
       image: newRecipe.image,
       difficulty: newRecipe.difficulty,
       prepTime: newRecipe.prepTime,
-      ingredients: newRecipe.ingredients || [],
-      isFavorite: false
-    };
-    setRecipes([...recipes, recipe]);
-    setNewRecipe({ 
-      name: '', 
-      description: '', 
-      image: '',
-      difficulty: 'Lako',
-      prepTime: '',
-      ingredients: []
-    });
+      ingredients: newRecipe.ingredients,
+    })
+      .then((created) => {
+        const r = {
+          id: created.id,
+          name: created.name,
+          description: created.description,
+          image: created.imageUrl || created.image,
+          difficulty: created.difficulty,
+          prepTime: created.prepTimeMinutes ? `${created.prepTimeMinutes} min` : newRecipe.prepTime,
+          ingredients: (created.RecipeIngredients || []).map((ri) => ({
+            name: ri.IngredientType?.name || '',
+            quantity: Number(ri.quantity || 0),
+            unit: ri.unit || '',
+          })),
+          isFavorite: false,
+        };
+        setRecipes((prev) => [...prev, r]);
+        setNewRecipe({ 
+          name: '', 
+          description: '', 
+          image: '',
+          difficulty: 'Lako',
+          prepTime: '',
+          ingredients: []
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        alert(err?.message || 'Greška pri dodavanju recepta.');
+      });
   };
 
   const handleDeleteRecipe = (id) => {
-    setRecipes(recipes.filter(r => r.id !== id));
+    apiDeleteRecipe(id)
+      .then(() => setRecipes(recipes.filter(r => r.id !== id)))
+      .catch((err) => {
+        console.error(err);
+        alert(err?.message || 'Greška pri brisanju recepta.');
+      });
   };
 
   // Order Management

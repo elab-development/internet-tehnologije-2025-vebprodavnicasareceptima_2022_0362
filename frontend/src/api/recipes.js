@@ -24,3 +24,14 @@ export async function removeFavoriteRecipe(recipeId) {
     method: "DELETE",
   });
 }
+
+export function createRecipe(payload) {
+  return apiFetch("/recipes", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteRecipe(id) {
+  return apiFetch(`/recipes/${id}`, { method: "DELETE" });
+}

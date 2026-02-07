@@ -5,6 +5,7 @@
  * Uses useState for cart management
  */
 import { useState } from 'react';
+import { deleteFromCart as apiDeleteFromCart, updateCartItem as apiUpdateCartItem, clearCart as apiClearCart } from '../api/cart';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 
@@ -12,7 +13,13 @@ export default function Cart({ role, cartItems, setCartItems }) {
   const navigate = useNavigate();
   // Handle remove item from cart
   const handleRemoveFromCart = (id) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
+    // call backend then update local state
+    apiDeleteFromCart(id)
+      .then(() => setCartItems(cartItems.filter(item => item.id !== id)))
+      .catch((err) => {
+        console.error(err);
+        alert(err?.message || 'Greška pri brisanju iz korpe.');
+      });
   };
 
   // Update quantity
@@ -21,9 +28,15 @@ export default function Cart({ role, cartItems, setCartItems }) {
       handleRemoveFromCart(id);
       return;
     }
-    setCartItems(cartItems.map(item =>
-      item.id === id ? { ...item, totalQuantity: newQuantity } : item
-    ));
+    // update backend then update local state
+    apiUpdateCartItem(id, newQuantity)
+      .then(() => setCartItems(cartItems.map(item =>
+        item.id === id ? { ...item, totalQuantity: newQuantity } : item
+      )))
+      .catch((err) => {
+        console.error(err);
+        alert(err?.message || 'Greška pri ažuriranju količine.');
+      });
   };
 
   // Calculate total
@@ -125,7 +138,14 @@ export default function Cart({ role, cartItems, setCartItems }) {
             <div className="cart-actions">
               <Button
                 label="Isprazni korpu"
-                onClick={() => setCartItems([])}
+                onClick={() => {
+                  apiClearCart()
+                    .then(() => setCartItems([]))
+                    .catch((err) => {
+                      console.error(err);
+                      alert(err?.message || 'Greška pri čišćenju korpe.');
+                    });
+                }}
                 variant="danger"
               />
               <Button

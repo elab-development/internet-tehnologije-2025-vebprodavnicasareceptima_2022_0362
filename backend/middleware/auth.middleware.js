@@ -33,8 +33,10 @@ async function requireAuth(req, res, next) {
 
 function requireRole(...allowedRoles) {
   return (req, res, next) => {
+    console.log('Role check middleware. User:', req.user, 'Allowed roles:', allowedRoles);
     if (!req.user) return res.status(401).json({ message: 'Niste ulogovani.' });
     if (!allowedRoles.includes(req.user.role)) {
+      console.log('Role mismatch. User role:', req.user.role, 'Expected one of:', allowedRoles);
       return res.status(403).json({ message: 'Nemate dozvolu (role).' });
     }
     next();

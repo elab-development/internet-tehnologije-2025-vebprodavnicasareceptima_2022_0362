@@ -150,4 +150,71 @@ exports.removeFavorite = async (req, res) => {
   }
 };
 
+exports.create = async (req, res) => {
+  try {
+    const { name, description, image, difficulty, prepTime, ingredients } = req.body;
+
+    if (!name || !description) {
+      return res.status(400).json({ message: 'name and description are required.' });
+    }
+
+    // try to parse prepTime minutes from string or number
+    let prepTimeMinutes = null;
+    if (prepTime != null) {
+      const m = String(prepTime).match(/(\d+)/);
+      if (m) prepTimeMinutes = Number(m[1]);
+    }
+
+    const created = await db.Recipe.create({
+      name,
+      description,
+      imageUrl: image || null,
+      difficulty: difficulty || null,
+      prepTimeMinutes,
+    });
+
+    // ingredients: array of { name, quantity, unit }
+    if (Array.isArray(ingredients)) {
+      for (const ing of ingredients) {
+        if (!ing.name) continue;
+        const [ingType] = await db.IngredientType.findOrCreate({ where: { name: ing.name } });
+        await db.RecipeIngredient.create({
+          recipeId: created.id,
+          ingredientTypeId: ingType.id,
+          quantity: ing.quantity || null,
+          unit: ing.unit || '',
+        });
+      }
+    }
+
+    const recipe = await db.Recipe.findByPk(created.id, {
+      include: [
+        { model: db.RecipeIngredient, include: [{ model: db.IngredientType, attributes: ['id', 'name'] }] },
+      ],
+    });
+
+    return res.status(201).json(recipe);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Greška pri kreiranju recepta.' });
+  }
+};
+
+exports.remove = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!id) return res.status(400).json({ message: 'Nevažeći id.' });
+
+    // delete recipe ingredients first (cascade may already handle it)
+    await db.RecipeIngredient.destroy({ where: { recipeId: id } });
+    const deleted = await db.Recipe.destroy({ where: { id } });
+    if (!deleted) return res.status(404).json({ message: 'Recept nije pronađen.' });
+
+    return res.json({ id });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Greška pri brisanju recepta.' });
+  }
+};
+
  
