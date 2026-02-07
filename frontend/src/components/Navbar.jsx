@@ -25,10 +25,9 @@ export default function Navbar() {
   return (
 <nav className="navbar">
 <div className={`navbar-container ${role === "guest" ? "navbar-guest" : ""}`}>
-<div className="navbar-brand">
-<h1 onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
-            🍳 RecipeStore
-</h1>
+<div className="navbar-brand" onClick={() => navigate("/")}>
+          <img src="/logo.png" alt="RecipeStore" className="navbar-logo" />
+          <h1>RecipeStore</h1>
 </div>
  
         <div className="navbar-menu">
