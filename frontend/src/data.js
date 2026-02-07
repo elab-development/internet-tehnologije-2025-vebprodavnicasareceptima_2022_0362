@@ -121,97 +121,97 @@ export const DUMMY_INGREDIENTS = [
   'Soja sos'
 ];
 
-// Products - concrete items that satisfy ingredients
+
 export const DUMMY_PRODUCTS = [
-  // Špageti products
+  // Špageti proizvodi
   { id: 1, name: 'Barilla Špageti 500g', ingredientType: 'Špageti', packageAmount: '500g', price: 250.00, image: '📦' },
   { id: 2, name: 'De Cecco Špageti 400g', ingredientType: 'Špageti', packageAmount: '400g', price: 280.00, image: '📦' },
   
-  // Jaja products
+  // Jaja proizvodi
   { id: 3, name: 'Domaća jaja kutija 10 komada', ingredientType: 'Jaja', packageAmount: '10 komada', price: 200.00, image: '🥚' },
   { id: 4, name: 'Domaća jaja kutija 6 komada', ingredientType: 'Jaja', packageAmount: '6 komada', price: 120.00, image: '🥚' },
   
-  // Sir products
+  // Sir proizvodi
   { id: 5, name: 'Kajmak sir 250g', ingredientType: 'Sir', packageAmount: '250g', price: 450.00, image: '🧀' },
   { id: 6, name: 'Madam sir 400g', ingredientType: 'Sir', packageAmount: '400g', price: 520.00, image: '🧀' },
   
-  // Maslac products
+  // Maslac proizvodi
   { id: 7, name: 'Lurija maslac 250g', ingredientType: 'Maslac', packageAmount: '250g', price: 350.00, image: '🧈' },
   { id: 8, name: 'Gavrilović maslac 250g', ingredientType: 'Maslac', packageAmount: '250g', price: 380.00, image: '🧈' },
   
-  // Losos products
+  // Losos proizvodi
   { id: 9, name: 'Losos file 500g', ingredientType: 'Losos', packageAmount: '500g', price: 2400.00, image: '🐟' },
   { id: 10, name: 'Losos file 300g', ingredientType: 'Losos', packageAmount: '300g', price: 1600.00, image: '🐟' },
   
-  // Zelena salata products
+  // Zelena salata proizvodi
   { id: 11, name: 'Ledenka salata 300g', ingredientType: 'Zelena salata', packageAmount: '300g', price: 70.00, image: '🥬' },
   { id: 12, name: 'Maslna salata 300g', ingredientType: 'Zelena salata', packageAmount: '300g', price: 80.00, image: '🥬' },
   
-  // Pančeta products
+  // Pančeta proizvodi
   { id: 13, name: 'Pančeta rezana 200g', ingredientType: 'Pančeta', packageAmount: '200g', price: 450.00, image: '🥓' },
   { id: 14, name: 'Pančeta kockice 250g', ingredientType: 'Pančeta', packageAmount: '250g', price: 500.00, image: '🥓' },
   
-  // Crni biber products
+  // Crni biber proizvodi
   { id: 15, name: 'Paprika crni biber 100g', ingredientType: 'Crni biber', packageAmount: '100g', price: 150.00, image: '🌶️' },
   { id: 16, name: 'Biber mleven 50g', ingredientType: 'Crni biber', packageAmount: '50g', price: 100.00, image: '🌶️' },
   
-  // Prepečeni hleb products
+  // Prepečeni hleb proizvodi
   { id: 17, name: 'Prepečeni hleb mešoviti 250g', ingredientType: 'Prepečeni hleb', packageAmount: '250g', price: 120.00, image: '🍞' },
   { id: 18, name: 'Prepečeni hleb crni 200g', ingredientType: 'Prepečeni hleb', packageAmount: '200g', price: 100.00, image: '🍞' },
-  
-  // Limun products
+
+  // Limun proizvodi
   { id: 19, name: 'Limun komadi 1kg', ingredientType: 'Limun', packageAmount: '1kg', price: 150.00, image: '🍋' },
   { id: 20, name: 'Limun komadi 500g', ingredientType: 'Limun', packageAmount: '500g', price: 80.00, image: '🍋' },
   
-  // Beli luk products
+  // Beli luk proizvodi
   { id: 21, name: 'Beli luk 500g', ingredientType: 'Beli luk', packageAmount: '500g', price: 100.00, image: '🧄' },
   { id: 22, name: 'Beli luk 1kg', ingredientType: 'Beli luk', packageAmount: '1kg', price: 180.00, image: '🧄' },
   
-  // Majčina dušica products
+  // Majčina dušica proizvodi
   { id: 23, name: 'Majčina dušica suvena 30g', ingredientType: 'Majčina dušica', packageAmount: '30g', price: 200.00, image: '🌿' },
   { id: 24, name: 'Majčina dušica suvena 50g', ingredientType: 'Majčina dušica', packageAmount: '50g', price: 300.00, image: '🌿' },
   
-  // Mleveno meso products
+  // Mleveno meso proivodi
   { id: 25, name: 'Mleveno meso od goveđine 500g', ingredientType: 'Mleveno meso', packageAmount: '500g', price: 900.00, image: '🥩' },
   { id: 26, name: 'Mleveno meso mešovito 500g', ingredientType: 'Mleveno meso', packageAmount: '500g', price: 850.00, image: '🥩' },
   
-  // Kukuruzne tortilje products
+  // Kukuruzne tortilje proizvodi
   { id: 27, name: 'Kukuruzne tortilje pakovanje 10 komada', ingredientType: 'Kukuruzne tortilje', packageAmount: '10 komada', price: 200.00, image: '🌽' },
   { id: 28, name: 'Kukuruzne tortilje pakovanje 20 komada', ingredientType: 'Kukuruzne tortilje', packageAmount: '20 komada', price: 380.00, image: '🌽' },
   
-  // Paradajz products
+  // Paradajz proizvodi
   { id: 29, name: 'Paradajz svež 1kg', ingredientType: 'Paradajz', packageAmount: '1kg', price: 150.00, image: '🍅' },
   { id: 30, name: 'Paradajz čerupja 500g', ingredientType: 'Paradajz', packageAmount: '500g', price: 200.00, image: '🍅' },
   
-  // Brašno products
+  // Brašno proizvodi
   { id: 31, name: 'Brašno tip 500 1kg', ingredientType: 'Brašno', packageAmount: '1kg', price: 120.00, image: '🌾' },
   { id: 32, name: 'Brašno tip 400 1kg', ingredientType: 'Brašno', packageAmount: '1kg', price: 130.00, image: '🌾' },
   
-  // Kakao products
+  // Kakao proizvodi
   { id: 33, name: 'Nesquik kakao 250g', ingredientType: 'Kakao', packageAmount: '250g', price: 350.00, image: '🍫' },
   { id: 34, name: 'Kakao prah 100g', ingredientType: 'Kakao', packageAmount: '100g', price: 200.00, image: '🍫' },
   
-  // Šećer products
+  // Šećer proizvodi
   { id: 35, name: 'Šećer 1kg', ingredientType: 'Šećer', packageAmount: '1kg', price: 120.00, image: '🍬' },
   { id: 36, name: 'Šećer 2kg', ingredientType: 'Šećer', packageAmount: '2kg', price: 220.00, image: '🍬' },
   
-  // Pirinčani rezanci products
+  // Pirinčani rezanci proizvodi
   { id: 37, name: 'Ramen rezanci 400g', ingredientType: 'Pirinčani rezanci', packageAmount: '400g', price: 150.00, image: '🍜' },
   { id: 38, name: 'Pirinčani rezanci 500g', ingredientType: 'Pirinčani rezanci', packageAmount: '500g', price: 180.00, image: '🍜' },
   
-  // Škampi products
+  // Škampi proizvodi
   { id: 39, name: 'Škampi zamrznut 500g', ingredientType: 'Škampi', packageAmount: '500g', price: 1200.00, image: '🦐' },
   { id: 40, name: 'Škampi zamrznut 300g', ingredientType: 'Škampi', packageAmount: '300g', price: 800.00, image: '🦐' },
   
-  // Kikiriki products
+  // Kikiriki proizvodi
   { id: 41, name: 'Kikiriki smeđi 250g', ingredientType: 'Kikiriki', packageAmount: '250g', price: 200.00, image: '🥜' },
   { id: 42, name: 'Kikiriki belo 300g', ingredientType: 'Kikiriki', packageAmount: '300g', price: 250.00, image: '🥜' },
   
-  // Limeta products
+  // Limeta proizvodi
   { id: 43, name: 'Limeta komadi 500g', ingredientType: 'Limeta', packageAmount: '500g', price: 120.00, image: '🍈' },
   { id: 44, name: 'Limeta komadi 1kg', ingredientType: 'Limeta', packageAmount: '1kg', price: 220.00, image: '🍈' },
   
-  // Soja sos products
+  // Soja sos proizvodi
   { id: 45, name: 'Kikkoman soja sos 250ml', ingredientType: 'Soja sos', packageAmount: '250ml', price: 250.00, image: '🫙' },
   { id: 46, name: 'San-J tamari soja sos 200ml', ingredientType: 'Soja sos', packageAmount: '200ml', price: 280.00, image: '🫙' }
 ];

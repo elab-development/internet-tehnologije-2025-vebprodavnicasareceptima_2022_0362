@@ -158,7 +158,7 @@ exports.create = async (req, res) => {
       return res.status(400).json({ message: 'name and description are required.' });
     }
 
-    // try to parse prepTime minutes from string or number
+    // parse prepTime minute iz stringa u broj
     let prepTimeMinutes = null;
     if (prepTime != null) {
       const m = String(prepTime).match(/(\d+)/);
@@ -173,7 +173,7 @@ exports.create = async (req, res) => {
       prepTimeMinutes,
     });
 
-    // ingredients: array of { name, quantity, unit }
+    // sastojci: niz { name, quantity, unit }
     if (Array.isArray(ingredients)) {
       for (const ing of ingredients) {
         if (!ing.name) continue;
@@ -205,7 +205,7 @@ exports.remove = async (req, res) => {
     const id = Number(req.params.id);
     if (!id) return res.status(400).json({ message: 'Nevažeći id.' });
 
-    // delete recipe ingredients first (cascade may already handle it)
+    // obriši sastojke recepta prvo (cascade možda već to radi)
     await db.RecipeIngredient.destroy({ where: { recipeId: id } });
     const deleted = await db.Recipe.destroy({ where: { id } });
     if (!deleted) return res.status(404).json({ message: 'Recept nije pronađen.' });

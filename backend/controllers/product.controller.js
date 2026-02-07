@@ -30,7 +30,7 @@ exports.create = async (req, res) => {
       return res.status(400).json({ message: 'name, ingredientType and price are required.' });
     }
 
-    // find or create ingredient type
+    // pronadji ili kreiraj tip sastojka
     const [ingType] = await db.IngredientType.findOrCreate({ where: { name: ingredientType } });
     console.log('Found or created ingredient type:', ingType.name);
 

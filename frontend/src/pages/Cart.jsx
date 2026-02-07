@@ -1,9 +1,4 @@
-/**
- * Cart Page
- * Registered users can view and manage shopping cart
- * Cart contains only ingredients/products, not recipes
- * Uses useState for cart management
- */
+
 import { useState } from 'react';
 import { deleteFromCart as apiDeleteFromCart, updateCartItem as apiUpdateCartItem, clearCart as apiClearCart } from '../api/cart';
 import { useNavigate } from 'react-router-dom';
@@ -22,13 +17,13 @@ export default function Cart({ role, cartItems, setCartItems }) {
       });
   };
 
-  // Update quantity
+  // Azuriranje količine proizvoda u korpi
   const handleUpdateQuantity = (id, newQuantity) => {
     if (newQuantity <= 0) {
       handleRemoveFromCart(id);
       return;
     }
-    // update backend then update local state
+    // ažuriranje backend-a pa ažuriranje lokalnog stanja
     apiUpdateCartItem(id, newQuantity)
       .then(() => setCartItems(cartItems.map(item =>
         item.id === id ? { ...item, totalQuantity: newQuantity } : item
@@ -39,12 +34,12 @@ export default function Cart({ role, cartItems, setCartItems }) {
       });
   };
 
-  // Calculate total
+  // Izračunavanje ukupne cene
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => total + item.price * item.totalQuantity, 0);
   };
 
-  // Check role
+  // Provera uloge
   if (role !== 'user') {
     return (
       <div className="cart-page">
@@ -121,7 +116,7 @@ export default function Cart({ role, cartItems, setCartItems }) {
               </tbody>
             </table>
 
-            {/* Cart Summary */}
+            {/* Ukupno */}
             <div className="cart-summary">
               <div className="summary-item">
                 <strong>Ukupan broj proizvoda:</strong> {cartItems.length}
@@ -134,7 +129,7 @@ export default function Cart({ role, cartItems, setCartItems }) {
               </div>
             </div>
 
-            {/* Cart Actions */}
+            {/* Akcije korpe */}
             <div className="cart-actions">
               <Button
                 label="Isprazni korpu"

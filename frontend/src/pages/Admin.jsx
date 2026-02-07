@@ -1,10 +1,3 @@
-/**
- * Admin Page
- * Administrator can manage products, recipes, and orders
- * CRUD operations for products and recipes
- * View and change order status
- * Uses useState for all management operations
- */
 import { useEffect, useState } from 'react';
 import { DUMMY_ORDERS } from '../data';
 import { createProduct, deleteProduct as apiDeleteProduct, getProducts } from '../api/products';
@@ -14,7 +7,7 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 
 export default function Admin({ role }) {
-  // useState hooks for admin management
+  // useState hooks za admin
   const [products, setProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(true);
   const [orders, setOrders] = useState(DUMMY_ORDERS);
@@ -103,7 +96,7 @@ export default function Admin({ role }) {
       });
   };
 
-  // Load products from API
+  // Ucitaj proizvode sa API-ja
   useEffect(() => {
     if (role !== 'admin') {
       setProductsLoading(false);
@@ -115,7 +108,7 @@ export default function Admin({ role }) {
     fetchIngredientTypes();
   }, [role]);
 
-  // Check role
+  // Provera uloge
   if (role !== 'admin') {
     return (
       <div className="admin-page">
@@ -128,7 +121,7 @@ export default function Admin({ role }) {
     );
   }
 
-  // Product Management
+  // Dodavanje proizvoda
   const handleAddProduct = () => {
     if (!newProduct.name || !newProduct.ingredientType || !newProduct.packageAmount || !newProduct.price || !newProduct.image) {
       alert('Molimo vas da popunite sva polja!');
@@ -144,7 +137,7 @@ export default function Admin({ role }) {
       return;
     }
 
-    // send to backend
+    // salji backendu
     createProduct({
       name: newProduct.name,
       ingredientType: newProduct.ingredientType,
@@ -153,7 +146,7 @@ export default function Admin({ role }) {
       image: newProduct.image,
     })
       .then((created) => {
-        // normalize product for admin list
+        // normalizuj proizvode za admin listu
         const p = {
           id: created.id,
           name: created.name,
@@ -181,7 +174,7 @@ export default function Admin({ role }) {
       });
   };
 
-  // Recipe Management
+  // Upravljanje receptima
   const handleAddIngredientToRecipe = () => {
     if (!newIngredient.name || !newIngredient.quantity || !newIngredient.unit) {
       alert('Molimo vas da popunite sva polja za sastojak!');
@@ -294,7 +287,7 @@ export default function Admin({ role }) {
         <p>Uređujte proizvode, recepte i porudžbine</p>
       </div>
 
-      {/* Tabs */}
+      {/* Tabovi */}
       <div className="admin-tabs">
         <Button
           label="Proizvodi"
@@ -316,12 +309,12 @@ export default function Admin({ role }) {
         />
       </div>
 
-      {/* Products Tab */}
+      {/* Proizvodi tab */}
       {activeTab === 'products' && (
         <div className="admin-section">
           <h3>Upravljanje proizvodima</h3>
 
-          {/* Add Product Form */}
+          {/* Dodavanje proizvoda forma */}
           <div className="admin-form">
             <h4>Dodaj novi proizvod</h4>
             <div className="form-group" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
@@ -384,7 +377,7 @@ export default function Admin({ role }) {
           
           </div>
 
-          {/* Products List */}
+          {/* Lista proizvoda */}
           <div className="admin-list">
             <h4>Proizvodi ({products.length})</h4>
             {productsLoading && <p>Učitavanje proizvoda...</p>}
@@ -425,12 +418,12 @@ export default function Admin({ role }) {
         </div>
       )}
 
-      {/* Recipes Tab */}
+      {/* Recepti tab */}
       {activeTab === 'recipes' && (
         <div className="admin-section">
           <h3>Upravljanje receptima</h3>
 
-          {/* Add Recipe Form */}
+          {/* Dodavanje recepta forma */}
           <div className="admin-form">
             <h4>Dodaj novi recept</h4>
             <div className="form-group" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
@@ -480,7 +473,7 @@ export default function Admin({ role }) {
               />
             </div>
 
-            {/* Ingredients Section */}
+            {/* Sekcija sa sastojcima */}
             <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '2px solid #ecf0f1' }}>
               <h5 style={{ marginBottom: '1rem' }}>Dodaj Sastojke</h5>
               
@@ -535,7 +528,7 @@ export default function Admin({ role }) {
                 </div>
               </div>
 
-              {/* Display Added Ingredients */}
+              {/* Prikaz dodatih sastojaka */}
               {newRecipe.ingredients.length > 0 && (
                 <div style={{ marginBottom: '1.5rem' }}>
                   <h5 style={{ marginBottom: '0.75rem' }}>Dodati Sastojci ({newRecipe.ingredients.length}):</h5>
@@ -565,7 +558,7 @@ export default function Admin({ role }) {
             </div>
         
 
-          {/* Recipes List */}
+          {/* Lista recepata */}
           <div className="admin-list">
             <h4>Recepti ({recipes.length})</h4>
             {recipesLoading && <p>Učitavanje recepata...</p>}
@@ -606,7 +599,7 @@ export default function Admin({ role }) {
         </div>
       )}
 
-      {/* Orders Tab */}
+      {/* Porudžbine tab */}
       {activeTab === 'orders' && (
         <div className="admin-section">
           <h3>Upravljanje porudžbinama</h3>
