@@ -11,9 +11,9 @@ export default function Navbar() {
   const role = user?.role ?? "guest";
   const userName = user?.username ?? user?.email ?? "";
  
-  const handleLogout = () => {
-    logout();
-    navigate("/");
+  const handleLogout = async () => {
+  await logout();
+  navigate("/");
   };
  
   const handleNavigation = (path) => {

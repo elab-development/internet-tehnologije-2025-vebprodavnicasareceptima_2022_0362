@@ -90,3 +90,8 @@ exports.login = async (req, res) => {
 exports.me = async (req, res) => {
   return res.json({ user: req.user });
 };
+
+
+exports.logout = async (req, res) => {
+  return res.json({ message: "Logout uspešan." });
+};

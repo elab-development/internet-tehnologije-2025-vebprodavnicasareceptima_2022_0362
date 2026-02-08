@@ -25,10 +25,10 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const logout = () => {
-    logoutApi();
-    setUser(null);
-  };
+  const logout = async () => {
+  await logoutApi();
+  setUser(null);
+};
 
   return (
     <AuthContext.Provider value={{ user, setUser, logout, loading }}>

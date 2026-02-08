@@ -35,6 +35,13 @@ export async function me() {
   return data.user;
 }
 
-export function logout() {
-  clearToken();
+export async function logout() {
+  try {
+    await apiFetch("/auth/logout", { method: "POST" });
+  } catch (e) {
+    console.warn("Logout API failed (ignored):", e?.message || e);
+  } finally {
+    clearToken();
+  }
 }
+
